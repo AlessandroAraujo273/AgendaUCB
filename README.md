@@ -24,6 +24,6 @@ sql/:
 Como Executar o Banco de Dados
 
 Abra o ambiente MySQL (Terminal ou MySQL Workbench).
-Execute o script sql/01_ddl.sql para criar o banco de dados sgatm e suas estruturas.
+Execute o script sql/01_ddl.sql para criar o banco de dados AgendaUcb e suas estruturas.
 Execute o script sql/02_carga.sql para popular as tabelas com os dados de teste.
 Execute as consultas presentes em sql/03_consultas.sql para validar o funcionamento das buscas.
