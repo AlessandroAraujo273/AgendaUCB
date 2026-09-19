@@ -1,5 +1,5 @@
 -- ==============================================================================
--- AgendaUCB — Script físico (DDL) Corrigido
+-- AgendaUCB — Script físico (DDL)
 -- Mapeamento da especialização: Tabelas Múltiplas (aluno, professor, administrativo)
 -- ==============================================================================
 
@@ -7,8 +7,7 @@ DROP DATABASE IF EXISTS agendaucb;
 CREATE DATABASE agendaucb;
 USE agendaucb;
 
--- RN06: A sigla de cada departamento deve ser única no sistema.
--- RN07: Um departamento pode estar subordinado a outro (autorrelacionamento hierárquico)
+-- RN05: Um departamento pode estar subordinado a, no máximo, um departamento superior.
 CREATE TABLE departamento (
     id_departamento INT AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
@@ -20,8 +19,10 @@ CREATE TABLE departamento (
     CONSTRAINT fk_departamento_pai FOREIGN KEY (id_departamento_pai) REFERENCES departamento(id_departamento) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- RN01, RN02: CPF e e-mail institucional únicos.
--- RN05: Todo usuário pertence a exatamente um departamento.
+-- RN01: Todo usuário do sistema deve ser classificado em exatamente um dos tipos: Aluno, Professor ou Administrativo.
+-- RN02: O CPF de cada usuário é único no sistema.
+-- RN03: O e-mail institucional de cada usuário é único no sistema.
+-- RN04: Cada usuário está vinculado a exatamente um departamento.
 CREATE TABLE usuario (
     id_usuario INT AUTO_INCREMENT,
     cpf VARCHAR(11) NOT NULL,
@@ -54,7 +55,6 @@ BEGIN
 END; //
 DELIMITER ;
 
--- RN09: Telefones de contato (entidade fraca).
 CREATE TABLE telefone_usuario (
     id_usuario INT NOT NULL,
     numero_telefone VARCHAR(20) NOT NULL,
@@ -63,6 +63,7 @@ CREATE TABLE telefone_usuario (
     CONSTRAINT fk_telefone_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- RN16: A matrícula de um aluno é única no sistema.
 -- Tabelas de Especialização (Mapeamento em Múltiplas Tabelas)
 CREATE TABLE aluno (
     id_usuario INT NOT NULL,
@@ -94,7 +95,6 @@ CREATE TABLE administrativo (
     CONSTRAINT fk_admin_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- RN10: Prédios com ao menos 1 andar.
 CREATE TABLE predio (
     id_predio INT AUTO_INCREMENT,
     nome VARCHAR(60) NOT NULL,
@@ -105,7 +105,7 @@ CREATE TABLE predio (
     CONSTRAINT ck_predio_andares CHECK (quantidade_andares > 0)
 );
 
--- RN11, RN12: Sala associada a prédio, número único.
+-- RN07: O número de uma sala é único dentro do prédio ao qual pertence, podendo se repetir em prédios diferentes.
 CREATE TABLE sala (
     id_predio INT NOT NULL,
     numero_sala VARCHAR(10) NOT NULL,
@@ -138,7 +138,9 @@ CREATE TABLE recurso (
     CONSTRAINT ck_recurso_qtd CHECK (quantidade_total_disponivel >= 0)
 );
 
--- RN15, RN16: Agendamento central.
+-- RN08: Em todo agendamento, a data/hora de início deve ser estritamente anterior à data/hora de término.
+-- RN09: Todo agendamento possui exatamente um usuário solicitante.
+-- RN10: Todo agendamento está associado a exatamente uma sala e a exatamente um tipo de agenda
 CREATE TABLE agendamento (
     id_agendamento INT AUTO_INCREMENT,
     data_hora_inicio DATETIME NOT NULL,
@@ -157,7 +159,7 @@ CREATE TABLE agendamento (
     CONSTRAINT ck_agendamento_datas CHECK (data_hora_inicio < data_hora_fim)
 );
 
--- RN18: Histórico de status.
+-- RN12: Toda mudança de situação de um agendamento deve gerar um novo registro de histórico.
 CREATE TABLE historico_status_agendamento (
     id_agendamento INT NOT NULL,
     numero_sequencia INT NOT NULL,
@@ -171,7 +173,8 @@ CREATE TABLE historico_status_agendamento (
     CONSTRAINT fk_historico_usuario FOREIGN KEY (id_usuario_responsavel) REFERENCES usuario(id_usuario) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- RN20: Recursos associados ao agendamento.
+-- RN13: A quantidade de um recurso reservado em um agendamento não pode exceder a quantidade total disponível.
+-- RN18: Todo recurso reservado em um agendamento deve pertencer ao catálogo de recursos.
 CREATE TABLE agendamento_recurso (
     id_agendamento INT NOT NULL,
     id_recurso INT NOT NULL,
@@ -183,7 +186,7 @@ CREATE TABLE agendamento_recurso (
     CONSTRAINT ck_ar_qtd CHECK (quantidade_reservada > 0)
 );
 
--- RN21: Participantes no agendamento.
+-- RN14: Um agendamento pode ter participantes além do solicitante, cada um com um papel e status de confirmação.
 CREATE TABLE participacao_agendamento (
     id_agendamento INT NOT NULL,
     id_usuario INT NOT NULL,
