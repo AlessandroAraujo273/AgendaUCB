@@ -14,6 +14,7 @@ Através da plataforma, é possível:
 - Alessandro de Araújo Magalhães — Modelador de Dados / DDL
 - Átila Batista Martins — Administrador de Banco / Carga
 - Carlos André Serpa Nataniel — Apresentador / Documentação e Regras de Negócio
+- Ângelo Gabriel Cirqueira Assunção Paraguai — Apresentador / Documentação e Regras de Negócio
 
 ## Tecnologias Utilizadas
 - SGBD: MySQL 8.0+
