@@ -15,6 +15,7 @@ Através da plataforma, é possível:
 - Átila Batista Martins — Administrador de Banco / Carga
 - Carlos André Serpa Nataniel — Apresentador / Documentação e Regras de Negócio
 - Ângelo Gabriel Cirqueira Assunção Paraguai — Apresentador / Documentação e Regras de Negócio
+-Daniel Pereira de Amorim - Consultas / Verificação de Dados
 
 ## Tecnologias Utilizadas
 - SGBD: MySQL 8.0+

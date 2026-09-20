@@ -1,31 +1,14 @@
 -- ==============================================================================
 -- AgendaUCB — Script de Carga de Dados (DML)
+-- Revisão e Controlo Transacional por: Daniel Pereira de Amorim
 -- Compatível com 01_ddl.sql. Insere dados coerentes, realistas e casos de contorno.
 -- ==============================================================================
 
 USE agendaucb;
 
--- Desativa temporariamente a verificação de chaves estrangeiras para garantir ordem livre de inserção se necessário,
--- embora a ordem abaixo já respeite totalmente as dependências.
-SET FOREIGN_KEY_CHECKS = 0;
+START TRANSACTION;
 
--- Limpa dados anteriores caso o script seja reexecutado na mesma base
-TRUNCATE TABLE participacao_agendamento;
-TRUNCATE TABLE agendamento_recurso;
-TRUNCATE TABLE historico_status_agendamento;
-TRUNCATE TABLE agendamento;
-TRUNCATE TABLE sala;
-TRUNCATE TABLE telefone_usuario;
-TRUNCATE TABLE aluno;
-TRUNCATE TABLE professor;
-TRUNCATE TABLE administrativo;
-TRUNCATE TABLE usuario;
-TRUNCATE TABLE recurso;
-TRUNCATE TABLE tipo_agendamento;
-TRUNCATE TABLE predio;
-TRUNCATE TABLE departamento;
 
-SET FOREIGN_KEY_CHECKS = 1;
 
 -- ==============================================================================
 -- 1. DEPARTAMENTO (RN06, RN07)
@@ -376,3 +359,11 @@ INSERT INTO participacao_agendamento (id_agendamento, id_usuario, papel_particip
 (3, 36, 'CONVIDADO', 'CONFIRMADO', '2026-09-28 17:00:00'),
 (4, 26, 'RESPONSAVEL_TECNICO', 'CONFIRMADO', '2026-09-29 09:30:00'),
 (4, 1, 'CONVIDADO', 'CONFIRMADO', '2026-09-29 10:00:00');
+
+COMMIT;
+
+-- validação da volumetria
+SELECT COUNT(*) AS Total_Usuarios FROM usuario;
+SELECT COUNT(*) AS Total_Agendamentos FROM agendamento;
+SELECT COUNT(*) AS Total_Historico FROM historico_status_agendamento;
+SELECT COUNT(*) AS Total_Recursos_Reservados FROM agendamento_recurso;
