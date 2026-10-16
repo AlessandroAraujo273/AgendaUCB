@@ -1,0 +1,4 @@
+# Modelo de configuração do banco (Copie este arquivo como 'db.properties' no seu PC)
+db.url=jdbc:mysql://localhost:3306/agendaucb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+db.user=root
+db.password=sua_senha_aqui
