@@ -1,16 +1,18 @@
 package br.ucb.agendaucb.model;
 
+import br.ucb.agendaucb.model.enums.TipoRecurso;
+
 public class Recurso {
     private int id_recurso;
     private String nome;
-    private String tipo_recurso;
+    private TipoRecurso tipo_recurso;
     private String patrimonio;
     private int qntd_disponivel;
 
     public Recurso() {
-    };
+    }
 
-    public Recurso(int id_recurso, String nome, String tipo_recurso, String patrimonio, int qntd_disponivel) {
+    public Recurso(int id_recurso, String nome, TipoRecurso tipo_recurso, String patrimonio, int qntd_disponivel) {
         this.id_recurso = id_recurso;
         this.nome = nome;
         this.tipo_recurso = tipo_recurso;
@@ -34,11 +36,11 @@ public class Recurso {
         this.nome = nome;
     }
 
-    public String getTipo_recurso() {
+    public TipoRecurso getTipo_recurso() {
         return tipo_recurso;
     }
 
-    public void setTipo_recurso(String tipo_recurso) {
+    public void setTipo_recurso(TipoRecurso tipo_recurso) {
         this.tipo_recurso = tipo_recurso;
     }
 
@@ -57,5 +59,4 @@ public class Recurso {
     public void setQntd_disponivel(int qntd_disponivel) {
         this.qntd_disponivel = qntd_disponivel;
     }
-
 }

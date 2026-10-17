@@ -1,16 +1,18 @@
 package br.ucb.agendaucb.model;
 
+import br.ucb.agendaucb.model.enums.TipoSala;
+
 public class Sala {
     private int id_predio;
     private String numero_sala;
     private int capacidade;
-    private String tipo_sala;
+    private TipoSala tipo_sala;
     private boolean possui_projetor;
 
     public Sala() {
     };
 
-    public Sala(int id_predio, String numero_sala, int capacidade, String tipo_sala, boolean possui_projetor) {
+    public Sala(int id_predio, String numero_sala, int capacidade, TipoSala tipo_sala, boolean possui_projetor) {
         this.id_predio = id_predio;
         this.numero_sala = numero_sala;
         this.capacidade = capacidade;
@@ -42,11 +44,11 @@ public class Sala {
         this.capacidade = capacidade;
     }
 
-    public String getTipo_sala() {
+    public TipoSala getTipo_sala() {
         return tipo_sala;
     }
 
-    public void setTipo_sala(String tipo_sala) {
+    public void setTipo_sala(TipoSala tipo_sala) {
         this.tipo_sala = tipo_sala;
     }
 
