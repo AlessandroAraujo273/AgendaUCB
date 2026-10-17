@@ -1,118 +1,136 @@
 package br.ucb.agendaucb;
 
+import br.ucb.agendaucb.dao.AgendamentoDAO;
 import br.ucb.agendaucb.dao.PredioDAO;
-import br.ucb.agendaucb.dao.RecursoDAO;
 import br.ucb.agendaucb.dao.SalaDAO;
 import br.ucb.agendaucb.dao.TipoAgendamentoDAO;
+import br.ucb.agendaucb.dao.UsuarioDAO;
+import br.ucb.agendaucb.model.Agendamento;
 import br.ucb.agendaucb.model.Predio;
-import br.ucb.agendaucb.model.Recurso;
 import br.ucb.agendaucb.model.Sala;
 import br.ucb.agendaucb.model.TipoAgendamento;
-import br.ucb.agendaucb.model.enums.TipoRecurso;
+import br.ucb.agendaucb.model.Usuario;
+import br.ucb.agendaucb.model.enums.SituacaoAgendamento;
 import br.ucb.agendaucb.model.enums.TipoSala;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
         PredioDAO predioDAO = new PredioDAO();
         SalaDAO salaDAO = new SalaDAO();
-        RecursoDAO recursoDAO = new RecursoDAO();
-        TipoAgendamentoDAO tipoAgendamentoDAO = new TipoAgendamentoDAO();
+        TipoAgendamentoDAO tipoDAO = new TipoAgendamentoDAO();
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        AgendamentoDAO agendamentoDAO = new AgendamentoDAO();
 
         try {
             // ==========================================
-            // 1. TESTES DO PREDIO DAO
+            // 1. GARANTIR A ESTRUTURA BASE (PREDIO, SALA, TIPO)
             // ==========================================
-            System.out.println("=== 1. TESTANDO PREDIO DAO ===");
-            // CEP alterado para "72000000" (8 dígitos) sem o hífen para respeitar a coluna CHAR(8)/VARCHAR(8)
-            Predio p1 = new Predio(0, "Bloco X - Testes", "Campus Taguatinga", "72000000", 3);
-            predioDAO.cadastrar(p1);
-            System.out.println("✅ Prédio cadastrado!");
+            System.out.println("=== 1. VERIFICANDO ESTRUTURA BASE (PREDIO / SALA / TIPO) ===");
 
+            // Prédio
             List<Predio> predios = predioDAO.listarTudo();
-            int idPredioTeste = predios.get(predios.size() - 1).getId_predio();
-            System.out.println("-> ID do Prédio de teste obtido: " + idPredioTeste);
+            int idPredio;
+            if (predios.isEmpty()) {
+                Predio predio = new Predio(0, "Bloco Central", "Campus Taguatinga", "72000000", 3);
+                predioDAO.cadastrar(predio);
+                predios = predioDAO.listarTudo();
+            }
+            idPredio = predios.get(0).getId_predio();
+
+            // Sala
+            Sala salaFixa = salaDAO.buscarPorChave(idPredio, "LAB-101");
+            if (salaFixa == null) {
+                salaFixa = new Sala(idPredio, "LAB-101", 40, TipoSala.LABORATORIO, true);
+                salaDAO.cadastrar(salaFixa);
+                System.out.println("[OK] Sala 'LAB-101' criada para o Predio ID " + idPredio);
+            }
+
+            // Tipo de Agendamento
+            List<TipoAgendamento> tipos = tipoDAO.listarTudo();
+            int idTipo;
+            if (tipos.isEmpty()) {
+                TipoAgendamento tipo = new TipoAgendamento(0, "Reuniao de Projeto", 60, false);
+                tipoDAO.cadastrar(tipo);
+                tipos = tipoDAO.listarTudo();
+            }
+            idTipo = tipos.get(0).getId_tipo();
+
+            System.out.println("[OK] Estrutura base pronta: Predio ID " + idPredio + " | Sala LAB-101 | Tipo ID " + idTipo);
 
             // ==========================================
-            // 2. TESTES DO SALA DAO (Chave Composta + Enum)
+            // 2. AUTENTICAR O USUÁRIO DO SCRIPT SQL
             // ==========================================
-            System.out.println("\n=== 2. TESTANDO SALA DAO ===");
-            Sala salaTemp = new Sala(idPredioTeste, "SALA-TESTE", 30, TipoSala.LABORATORIO, true);
-            salaDAO.cadastrar(salaTemp);
-            System.out.println("✅ Sala 'SALA-TESTE' cadastrada no Prédio " + idPredioTeste);
+            System.out.println("\n=== 2. TENTANDO AUTENTICAR O USUÁRIO DO BANCO ===");
 
-            Sala salaEncontrada = salaDAO.buscarPorChave(idPredioTeste, "SALA-TESTE");
-            if (salaEncontrada != null) {
-                System.out.println("-> Sala encontrada via chave composta: " + salaEncontrada.getNumero_sala() + " | Tipo: " + salaEncontrada.getTipo_sala());
-                
-                salaEncontrada.setTipo_sala(TipoSala.AUDITORIO);
-                salaEncontrada.setCapacidade(60);
-                salaDAO.atualizar(salaEncontrada);
-                System.out.println("✅ Sala atualizada para AUDITORIO via chave composta!");
+            String emailInstitucional = "atila.batista@ucb.br";
+            String senhaHash = "hash_senha_123";
+
+            Usuario usuarioLogado = usuarioDAO.autenticar(emailInstitucional, senhaHash);
+
+            if (usuarioLogado != null) {
+                System.out.println("[OK] Autenticacao realizada com sucesso!");
+                System.out.println(" -> ID Recuperado do Banco: " + usuarioLogado.getId_usuario());
+                System.out.println(" -> Nome: " + usuarioLogado.getNome() + " " + usuarioLogado.getSobrenome());
+                System.out.println(" -> Email: " + usuarioLogado.getEmail_institucional());
+                System.out.println(" -> Perfil: " + usuarioLogado.getTipo_usuario());
+            } else {
+                System.err.println("[ERRO] Usuario nao encontrado! Certifique-se de ter executado o script INSERT no MySQL.");
+                return;
             }
 
             // ==========================================
-            // 3. TESTES DO RECURSO DAO (Enum TipoRecurso)
+            // 3. AGENDAR COM O USUÁRIO AUTENTICADO
             // ==========================================
-            System.out.println("\n=== 3. TESTANDO RECURSO DAO ===");
-            Recurso recursoTemp = new Recurso(0, "Kit Cabo HDMI 10m", TipoRecurso.CONSUMO, "PAT-TESTE", 10);
-            recursoDAO.cadastrar(recursoTemp);
-            System.out.println("✅ Recurso cadastrado!");
+            System.out.println("\n=== 3. CRIANDO AGENDAMENTO COM O USUÁRIO AUTENTICADO ===");
 
-            List<Recurso> recursos = recursoDAO.listarTudo();
-            int idRecursoTeste = recursos.get(recursos.size() - 1).getId_recurso();
-            
-            Recurso recEncontrado = recursoDAO.buscarPorId(idRecursoTeste);
-            if (recEncontrado != null) {
-                System.out.println("-> Recurso encontrado: " + recEncontrado.getNome() + " | Tipo: " + recEncontrado.getTipo_recurso());
-                
-                recEncontrado.setTipo_recurso(TipoRecurso.EQUIPAMENTO);
-                recursoDAO.atualizar(recEncontrado);
-                System.out.println("✅ Recurso atualizado para EQUIPAMENTO!");
+            // Define horários dinâmicos sem risco de conflitos
+            long tempoAtual = System.currentTimeMillis();
+            Timestamp inicio = new Timestamp(tempoAtual + 86400000L); // Amanhã neste horário
+            Timestamp fim = new Timestamp(tempoAtual + 90000000L);    // +1h horas depois
+            Timestamp agora = new Timestamp(tempoAtual);
+
+            Agendamento novoAgendamento = new Agendamento(
+                    0,
+                    inicio,
+                    fim,
+                    SituacaoAgendamento.SOLICITADO,
+                    "Reserva para testes do sistema via Java",
+                    agora,
+                    usuarioLogado.getId_usuario(),
+                    idPredio,
+                    "LAB-101",
+                    idTipo
+            );
+
+            boolean cadastrou = agendamentoDAO.cadastrar(novoAgendamento);
+
+            if (cadastrou) {
+                System.out.println("[OK] Agendamento gravado no banco de dados com sucesso!");
+            } else {
+                System.out.println("[AVISO] Nao foi possivel agendar devido a conflito de horario.");
             }
 
             // ==========================================
-            // 4. TESTES DO TIPO AGENDAMENTO DAO
+            // 4. CONSULTA FINAL DOS REGISTROS
             // ==========================================
-            System.out.println("\n=== 4. TESTANDO TIPO AGENDAMENTO DAO ===");
-            TipoAgendamento tipoTemp = new TipoAgendamento(0, "Reunião de Alinhamento", 60, false);
-            tipoAgendamentoDAO.cadastrar(tipoTemp);
-            System.out.println("✅ Tipo de agendamento cadastrado!");
+            System.out.println("\n=== 4. LISTA DE AGENDAMENTOS NO BANCO ===");
 
-            List<TipoAgendamento> tipos = tipoAgendamentoDAO.listarTudo();
-            int idTipoTeste = tipos.get(tipos.size() - 1).getId_tipo();
-
-            TipoAgendamento tipoEncontrado = tipoAgendamentoDAO.buscarPorId(idTipoTeste);
-            if (tipoEncontrado != null) {
-                System.out.println("-> Tipo Agendamento encontrado: " + tipoEncontrado.getDescricao());
-                
-                tipoEncontrado.setDuracao_minutos(90);
-                tipoAgendamentoDAO.atualizar(tipoEncontrado);
-                System.out.println("✅ Duração atualizada para 90 minutos!");
+            List<Agendamento> listaAgendamentos = agendamentoDAO.listarTudo();
+            for (Agendamento a : listaAgendamentos) {
+                System.out.println("ID: " + a.getIdAgendamento() +
+                                   " | Solicitante (Id_usuario): " + a.getIdUsuario() +
+                                   " | Sala: " + a.getNumeroSala() +
+                                   " | Inicio: " + a.getInicio() +
+                                   " | Status: " + a.getSituacao());
             }
 
-            // ==========================================
-            // 5. LIMPEZA DOS DADOS DE TESTE (DELETES)
-            // ==========================================
-            System.out.println("\n=== 5. EXECUTANDO LIMPEZA DOS REGISTROS DE TESTE ===");
-            
-            salaDAO.deletar(idPredioTeste, "SALA-TESTE");
-            System.out.println("✅ Sala de teste removida via chave composta.");
-
-            predioDAO.deletar(idPredioTeste);
-            System.out.println("✅ Prédio de teste removido.");
-
-            recursoDAO.deletar(idRecursoTeste);
-            System.out.println("✅ Recurso de teste removido.");
-
-            tipoAgendamentoDAO.deletar(idTipoTeste);
-            System.out.println("✅ Tipo de agendamento de teste removido.");
-
-            System.out.println("\n🎉 TODOS OS TESTES DOS 4 DAOs FORAM CONCLUÍDOS COM SUCESSO!");
+            System.out.println("\n[SUCESSO] Fluxo de login e agendamento concluido!");
 
         } catch (Exception e) {
-            System.err.println("❌ Erro durante os testes integrados:");
+            System.err.println("[ERRO] Falha durante a execucao do teste:");
             e.printStackTrace();
         }
     }
