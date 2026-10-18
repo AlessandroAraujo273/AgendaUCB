@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgendaUCB - Gerenciar Recursos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-slate-100 text-slate-800 flex h-screen overflow-hidden font-sans antialiased"
+  >
+    <!-- ================= SIDEBAR ================= -->
+    <!-- SIDEBAR ESCURA PADRONIZADA (AgendaUCB) -->
+    <aside
+      class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 min-h-screen border-r border-slate-800 shadow-xl select-none"
+    >
+      <!-- Topo / Marca -->
+      <div
+        class="h-16 px-5 flex items-center gap-3 border-b border-slate-800/80 bg-slate-950/40"
+      >
+        <div
+          class="w-10 h-10 rounded-xl bg-blue-600 text-white font-black flex items-center justify-center text-base shadow-lg shadow-blue-600/30 tracking-wider"
+        >
+          UCB
+        </div>
+        <div class="overflow-hidden">
+          <h1
+            class="font-bold text-white text-base leading-tight tracking-wide"
+          >
+            AgendaUCB
+          </h1>
+          <span class="text-[11px] text-slate-400 font-medium"
+            >Gestão de Espaços</span
+          >
+        </div>
+      </div>
+
+      <!-- Navegação Principal -->
+      <nav class="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+        <p
+          class="px-3 pb-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
+        >
+          Menu Principal
+        </p>
+
+        <!-- 1. Visão Geral (Dashboard) -->
+        <a
+          href="/index.html"
+          class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+        >
+          <span class="text-base">📊</span>
+          <span>Visão Geral</span>
+        </a>
+
+        <!-- 2. Agendamentos (O auth.js ajusta o link se for admin ou aluno/professor) -->
+        <a
+          id="link-nav-agendamentos"
+          href="/agendamento-usuario.html"
+          class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+        >
+          <span class="text-base">📅</span>
+          <span>Agendamentos</span>
+        </a>
+
+        <!-- SEÇÃO ADMINISTRATIVA (Ocultada automaticamente para Aluno e Professor) -->
+        <div class="somente-admin pt-3 mt-2 border-t border-slate-800/60">
+          <p
+            class="px-3 pb-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
+          >
+            Administração
+          </p>
+
+          <!-- 3. Recursos -->
+          <a
+            href="/recursos.html"
+            class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+          >
+            <span class="text-base">📦</span>
+            <span>Recursos</span>
+          </a>
+
+          <!-- 4. Dependências (Prédios e Salas) -->
+          <a
+            href="/dependencias.html"
+            class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+          >
+            <span class="text-base">🏢</span>
+            <span>Dependências</span>
+          </a>
+
+          <!-- 5. Usuários -->
+          <a
+            href="/usuarios.html"
+            class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+          >
+            <span class="text-base">👥</span>
+            <span>Usuários</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- Rodapé da Sidebar -->
+      <div class="p-3 border-t border-slate-800/80 bg-slate-950/30">
+        <a
+          href="/perfil.html"
+          class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+        >
+          <span class="text-base">⚙️</span>
+          <span>Meu Perfil</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ================= CONTEÚDO ================= -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <!-- Header -->
+      <header
+        class="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between shrink-0 shadow-sm"
+      >
+        <div>
+          <h2 id="page-title" class="text-xl font-bold text-slate-800">
+            Visão Geral
+          </h2>
+          <p class="text-xs text-slate-500">
+            Painel de controle e monitoramento
+          </p>
+        </div>
+
+        <!-- ✅ COLOQUE APENAS ESTA DIV AQUI: -->
+        <div id="user-header-profile"></div>
+      </header>
+
+      <!-- Main -->
+      <main class="flex-1 overflow-y-auto p-8 space-y-6">
+        <!-- ÁREA DE NOTIFICAÇÕES / ERROS GLOBAIS NA TELA -->
+        <div
+          id="alerta-feedback"
+          class="hidden rounded-lg p-4 text-sm font-medium border transition-all duration-300"
+        >
+          <div class="flex items-start justify-between">
+            <div class="flex items-center gap-2">
+              <span id="alerta-icone" class="text-lg"></span>
+              <span id="alerta-mensagem"></span>
+            </div>
+            <button
+              type="button"
+              onclick="fecharAlerta()"
+              class="text-slate-400 hover:text-slate-600 font-bold ml-4"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- Barra de Ações (Busca + Botão Adicionar) -->
+        <div
+          class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"
+        >
+          <div class="w-full sm:w-80">
+            <input
+              type="text"
+              id="filtro-busca"
+              placeholder="Buscar por nome ou patrimônio..."
+              class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <button
+            id="btn-novo-recurso"
+            class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow transition flex items-center justify-center gap-2"
+          >
+            <span>➕</span>
+            <span>Cadastrar Recurso</span>
+          </button>
+        </div>
+
+        <!-- Tabela de Recursos -->
+        <div
+          class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+        >
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead
+                class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-200"
+              >
+                <tr>
+                  <th class="px-6 py-3.5 font-semibold">ID</th>
+                  <th class="px-6 py-3.5 font-semibold">Nome do Recurso</th>
+                  <th class="px-6 py-3.5 font-semibold">Tipo</th>
+                  <th class="px-6 py-3.5 font-semibold">Patrimônio</th>
+                  <th class="px-6 py-3.5 font-semibold text-center">
+                    Quantidade Disp.
+                  </th>
+                  <th class="px-6 py-3.5 font-semibold text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody
+                id="tabela-recursos-corpo"
+                class="divide-y divide-slate-100"
+              >
+                <tr>
+                  <td colspan="6" class="px-6 py-8 text-center text-slate-400">
+                    <span class="inline-block animate-spin mr-2">⏳</span>
+                    Carregando recursos do banco de dados...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ================= MODAL DE CADASTRO / EDIÇÃO ================= -->
+    <div
+      id="modal-recurso"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200 overflow-hidden transform transition-all"
+      >
+        <!-- Cabeçalho do Modal -->
+        <div
+          class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50"
+        >
+          <div>
+            <h3 id="modal-titulo" class="text-base font-bold text-slate-800">
+              Cadastrar Novo Recurso
+            </h3>
+            <p class="text-xs text-slate-500">
+              Preencha os dados do recurso da UCB
+            </p>
+          </div>
+          <button
+            type="button"
+            id="btn-fechar-modal"
+            class="text-slate-400 hover:text-slate-600 text-xl font-bold"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Erro dentro do Modal -->
+        <div
+          id="modal-alerta-erro"
+          class="hidden mx-6 mt-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg font-medium flex items-center gap-2"
+        >
+          <span>⚠️</span>
+          <span id="modal-alerta-texto"></span>
+        </div>
+
+        <!-- Formulário -->
+        <form id="form-recurso" class="p-6 space-y-4">
+          <input type="hidden" id="campo-id" name="id_recurso" />
+
+          <div>
+            <label
+              for="campo-nome"
+              class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+              >Nome do Recurso *</label
+            >
+            <input
+              type="text"
+              id="campo-nome"
+              name="nome"
+              placeholder="Ex: Laboratório de Informática 03, Projetor Epson"
+              required
+              class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label
+                for="campo-tipo"
+                class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+              >
+                Tipo de Recurso *
+              </label>
+              <select
+                id="campo-tipo"
+                name="tipo_recurso"
+                required
+                class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-700"
+              >
+                <option value="" disabled selected>Selecione um tipo...</option>
+                <option value="EQUIPAMENTO">EQUIPAMENTO</option>
+                <option value="CONSUMO">CONSUMO</option>
+                <option value="CHAVE">CHAVE</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                for="campo-patrimonio"
+                class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+                >Nº Patrimônio *</label
+              >
+              <input
+                type="text"
+                id="campo-patrimonio"
+                name="patrimonio"
+                placeholder="Ex: PAT-2024-001"
+                required
+                class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="campo-quantidade"
+              class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+              >Quantidade Disponível *</label
+            >
+            <input
+              type="number"
+              id="campo-quantidade"
+              name="quantidade_total_disponivel"
+              placeholder="1"
+              min="0"
+              required
+              class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <!-- Botões de Ação do Modal -->
+          <div
+            class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3"
+          >
+            <button
+              type="button"
+              id="btn-cancelar-modal"
+              class="px-4 py-2 border border-slate-300 text-slate-600 hover:bg-slate-50 text-sm font-semibold rounded-lg transition"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              id="btn-salvar-modal"
+              class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow transition flex items-center gap-2"
+            >
+              <span id="btn-salvar-texto">Salvar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="Javascript/api.js"></script>
+    <script src="javascript/auth.js"></script>
+    <script src="Javascript/recursos.js"></script>
+    <script src="javascript/api.js"></script>
+  </body>
+</html>

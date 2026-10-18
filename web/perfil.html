@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgendaUCB - Editar Meus Dados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-slate-100 text-slate-800 flex h-screen overflow-hidden font-sans antialiased"
+  >
+    <!-- Sidebar -->
+    <!-- SIDEBAR ESCURA PADRONIZADA (AgendaUCB) -->
+<aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 min-h-screen border-r border-slate-800 shadow-xl select-none">
+    
+    <!-- Topo / Marca -->
+    <div class="h-16 px-5 flex items-center gap-3 border-b border-slate-800/80 bg-slate-950/40">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white font-black flex items-center justify-center text-base shadow-lg shadow-blue-600/30 tracking-wider">
+            UCB
+        </div>
+        <div class="overflow-hidden">
+            <h1 class="font-bold text-white text-base leading-tight tracking-wide">AgendaUCB</h1>
+            <span class="text-[11px] text-slate-400 font-medium">Gestão de Espaços</span>
+        </div>
+    </div>
+
+    <!-- Navegação Principal -->
+    <nav class="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+        <p class="px-3 pb-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            Menu Principal
+        </p>
+
+        <!-- 1. Visão Geral (Dashboard) -->
+        <a href="/index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+            <span class="text-base">📊</span>
+            <span>Visão Geral</span>
+        </a>
+
+        <!-- 2. Agendamentos (O auth.js ajusta o link se for admin ou aluno/professor) -->
+        <a id="link-nav-agendamentos" href="/agendamento-usuario.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+            <span class="text-base">📅</span>
+            <span>Agendamentos</span>
+        </a>
+
+        <!-- SEÇÃO ADMINISTRATIVA (Ocultada automaticamente para Aluno e Professor) -->
+        <div class="somente-admin pt-3 mt-2 border-t border-slate-800/60">
+            <p class="px-3 pb-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                Administração
+            </p>
+
+            <!-- 3. Recursos -->
+            <a href="/recursos.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+                <span class="text-base">📦</span>
+                <span>Recursos</span>
+            </a>
+
+            <!-- 4. Dependências (Prédios e Salas) -->
+            <a href="/dependencias.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+                <span class="text-base">🏢</span>
+                <span>Dependências</span>
+            </a>
+
+            <!-- 5. Usuários -->
+            <a href="/usuarios.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+                <span class="text-base">👥</span>
+                <span>Usuários</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Rodapé da Sidebar -->
+    <div class="p-3 border-t border-slate-800/80 bg-slate-950/30">
+        <a href="/perfil.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+            <span class="text-base">⚙️</span>
+            <span>Meu Perfil</span>
+        </a>
+    </div>
+
+</aside>
+
+
+    <!-- Conteúdo Principal -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <!-- Header com Nome e Foto Clicável -->
+      <header
+        class="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between shrink-0 shadow-sm"
+      >
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">
+            Meus Dados Cadastrais
+          </h2>
+          <p class="text-xs text-slate-500">
+            Atualize suas informações no sistema
+          </p>
+        </div>
+        <div id="user-header-profile"></div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto p-8 max-w-2xl">
+        <div
+          id="alerta-perfil"
+          class="hidden mb-6 p-4 text-xs font-semibold rounded-lg border"
+        ></div>
+
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+          <form id="form-perfil" class="space-y-4">
+            <input type="hidden" id="perfil-id" />
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+                  >Nome</label
+                >
+                <input
+                  type="text"
+                  id="perfil-nome"
+                  required
+                  class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+                  >Sobrenome</label
+                >
+                <input
+                  type="text"
+                  id="perfil-sobrenome"
+                  required
+                  class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+                >E-mail Institucional</label
+              >
+              <input
+                type="email"
+                id="perfil-email"
+                required
+                class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300"
+              />
+            </div>
+
+            <div>
+              <label
+                class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+                >Nova Senha (deixe em branco para não alterar)</label
+              >
+              <input
+                type="password"
+                id="perfil-senha"
+                placeholder="••••••••"
+                class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+                  >Tipo de Perfil</label
+                >
+                <input
+                  type="text"
+                  id="perfil-tipo"
+                  disabled
+                  class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-100 text-slate-500 font-bold"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+                  >ID Departamento</label
+                >
+                <input
+                  type="number"
+                  id="perfil-dep"
+                  required
+                  class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300"
+                />
+              </div>
+            </div>
+
+            <div class="pt-4 flex justify-end gap-3">
+              <button
+                type="submit"
+                id="btn-atualizar"
+                class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition"
+              >
+                Salvar Alterações
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+
+    <script src="javascript/api.js"></script>
+    <script src="javascript/auth.js"></script>
+    <script>
+      // Carrega os dados do usuário autenticado no form
+      const usuario = Auth.exigirAutenticacao();
+      if (usuario) {
+        document.getElementById("perfil-id").value = usuario.id_usuario;
+        document.getElementById("perfil-nome").value = usuario.nome || "";
+        document.getElementById("perfil-sobrenome").value =
+          usuario.sobrenome || "";
+        document.getElementById("perfil-email").value =
+          usuario.email_institucional || "";
+        document.getElementById("perfil-tipo").value = Auth.formatarTipo(
+          usuario.tipo_usuario,
+        );
+        document.getElementById("perfil-dep").value =
+          usuario.id_departamento || 1;
+      }
+
+      // Salva atualização via PUT /api/usuarios
+      document
+        .getElementById("form-perfil")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const alerta = document.getElementById("alerta-perfil");
+          alerta.className = "hidden";
+
+          const payload = {
+            id_usuario: parseInt(
+              document.getElementById("perfil-id").value,
+              10,
+            ),
+            nome: document.getElementById("perfil-nome").value.trim(),
+            sobrenome: document.getElementById("perfil-sobrenome").value.trim(),
+            email_institucional: document
+              .getElementById("perfil-email")
+              .value.trim(),
+            id_departamento: parseInt(
+              document.getElementById("perfil-dep").value,
+              10,
+            ),
+          };
+
+          const novaSenha = document.getElementById("perfil-senha").value;
+          if (novaSenha && novaSenha.trim().length > 0) {
+            payload.senha = novaSenha;
+          }
+
+          try {
+            const resp = await API.put(
+              `/usuarios?id=${payload.id_usuario}`,
+              payload,
+            );
+
+            // Atualiza a sessão local
+            const atualizado = { ...usuario, ...payload };
+            Auth.salvarSessao(atualizado);
+            Auth.renderizarHeader();
+
+            alerta.className =
+              "mb-6 p-4 text-xs font-semibold rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 block";
+            alerta.textContent =
+              resp.mensagem || "Dados atualizados com sucesso!";
+          } catch (err) {
+            alerta.className =
+              "mb-6 p-4 text-xs font-semibold rounded-lg bg-rose-50 border border-rose-200 text-rose-800 block";
+            alerta.textContent = `Erro ao atualizar dados: ${err.message}`;
+          }
+        });
+    </script>
+  </body>
+</html>

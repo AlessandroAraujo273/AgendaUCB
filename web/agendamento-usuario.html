@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solicitar Agendamento - AgendaUCB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <!-- SIDEBAR ESCURA PADRONIZADA (AgendaUCB) -->
+      <aside
+        class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 min-h-screen border-r border-slate-800 shadow-xl select-none"
+      >
+        <!-- Topo / Marca -->
+        <div
+          class="h-16 px-5 flex items-center gap-3 border-b border-slate-800/80 bg-slate-950/40"
+        >
+          <div
+            class="w-10 h-10 rounded-xl bg-blue-600 text-white font-black flex items-center justify-center text-base shadow-lg shadow-blue-600/30 tracking-wider"
+          >
+            UCB
+          </div>
+          <div class="overflow-hidden">
+            <h1
+              class="font-bold text-white text-base leading-tight tracking-wide"
+            >
+              AgendaUCB
+            </h1>
+            <span class="text-[11px] text-slate-400 font-medium"
+              >Gestão de Espaços</span
+            >
+          </div>
+        </div>
+
+        <!-- Navegação Principal -->
+        <nav class="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+          <p
+            class="px-3 pb-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
+          >
+            Menu Principal
+          </p>
+
+          <!-- 1. Visão Geral (Dashboard) -->
+          <a
+            href="/index.html"
+            class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+          >
+            <span class="text-base">📊</span>
+            <span>Visão Geral</span>
+          </a>
+
+          <!-- 2. Agendamentos (O auth.js ajusta o link se for admin ou aluno/professor) -->
+          <a
+            id="link-nav-agendamentos"
+            href="/agendamento-usuario.html"
+            class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+          >
+            <span class="text-base">📅</span>
+            <span>Agendamentos</span>
+          </a>
+
+          <!-- SEÇÃO ADMINISTRATIVA (Ocultada automaticamente para Aluno e Professor) -->
+          <div class="somente-admin pt-3 mt-2 border-t border-slate-800/60">
+            <p
+              class="px-3 pb-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
+            >
+              Administração
+            </p>
+
+            <!-- 3. Recursos -->
+            <a
+              href="/recursos.html"
+              class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+            >
+              <span class="text-base">📦</span>
+              <span>Recursos</span>
+            </a>
+
+            <!-- 4. Dependências (Prédios e Salas) -->
+            <a
+              href="/dependencias.html"
+              class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+            >
+              <span class="text-base">🏢</span>
+              <span>Dependências</span>
+            </a>
+
+            <!-- 5. Usuários -->
+            <a
+              href="/usuarios.html"
+              class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+            >
+              <span class="text-base">👥</span>
+              <span>Usuários</span>
+            </a>
+          </div>
+        </nav>
+
+        <!-- Rodapé da Sidebar -->
+        <div class="p-3 border-t border-slate-800/80 bg-slate-950/30">
+          <a
+            href="/perfil.html"
+            class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+          >
+            <span class="text-base">⚙️</span>
+            <span>Meu Perfil</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Conteúdo Principal -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header Superior -->
+        <header
+          class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0"
+        >
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">
+              Solicitar Sala ou Espaço
+            </h2>
+            <p class="text-xs text-slate-500">
+              Agende horários para estudos, aulas e reuniões
+            </p>
+          </div>
+          <div id="user-header-profile"></div>
+        </header>
+
+        <!-- Área de Conteúdo -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+          <!-- Alertas de Erro e Sucesso -->
+          <div
+            id="box-alerta-erro"
+            class="hidden p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-3"
+          >
+            <span class="text-lg">⚠️</span>
+            <div class="flex-1" id="texto-alerta-erro"></div>
+            <button
+              onclick="
+                document
+                  .getElementById('box-alerta-erro')
+                  .classList.add('hidden')
+              "
+              class="text-red-400 hover:text-red-600 font-bold"
+            >
+              &times;
+            </button>
+          </div>
+
+          <div
+            id="box-alerta-sucesso"
+            class="hidden p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm flex items-start gap-3"
+          >
+            <span class="text-lg">✅</span>
+            <div class="flex-1" id="texto-alerta-sucesso"></div>
+            <button
+              onclick="
+                document
+                  .getElementById('box-alerta-sucesso')
+                  .classList.add('hidden')
+              "
+              class="text-emerald-400 hover:text-emerald-600 font-bold"
+            >
+              &times;
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Coluna da Esquerda: Formulário de Novo Agendamento -->
+            <div
+              class="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"
+            >
+              <div class="mb-5 pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-base">
+                  Novo Agendamento
+                </h3>
+                <p class="text-xs text-slate-500">
+                  Preencha os dados da sua solicitação
+                </p>
+              </div>
+
+              <form id="form-novo-agendamento" class="space-y-4">
+                <!-- Prédio -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1"
+                    >Prédio *</label
+                  >
+                  <select
+                    id="campo-predio"
+                    required
+                    class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                  >
+                    <option value="">Carregando prédios...</option>
+                  </select>
+                </div>
+
+                <!-- Sala -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1"
+                    >Sala *</label
+                  >
+                  <select
+                    id="campo-sala"
+                    required
+                    disabled
+                    class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50"
+                  >
+                    <option value="">Selecione primeiro um prédio</option>
+                  </select>
+                </div>
+
+                <!-- Tipo de Agendamento -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1"
+                    >Tipo de Atividade *</label
+                  >
+                  <select
+                    id="campo-tipo"
+                    required
+                    class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                  >
+                    <option value="">Carregando tipos...</option>
+                  </select>
+                  <p
+                    id="info-duracao-tipo"
+                    class="text-xs text-slate-400 mt-1"
+                  ></p>
+                </div>
+
+                <!-- Data e Início -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1"
+                    >Início *</label
+                  >
+                  <input
+                    type="datetime-local"
+                    id="campo-inicio"
+                    required
+                    class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+
+                <!-- Data e Fim -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1"
+                    >Fim *</label
+                  >
+                  <input
+                    type="datetime-local"
+                    id="campo-fim"
+                    required
+                    class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+
+                <!-- Motivo / Descrição -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1"
+                    >Finalidade / Motivo *</label
+                  >
+                  <textarea
+                    id="campo-motivo"
+                    rows="3"
+                    required
+                    placeholder="Ex: Grupo de estudos de Cálculo, gravação de apresentação..."
+                    class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  ></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  id="btn-enviar-agendamento"
+                  class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow transition"
+                >
+                  Confirmar Agendamento
+                </button>
+              </form>
+            </div>
+
+            <!-- Coluna da Direita: Meus Agendamentos -->
+            <div
+              class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col"
+            >
+              <div
+                class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100"
+              >
+                <div>
+                  <h3 class="font-bold text-slate-800 text-base">
+                    Meus Agendamentos
+                  </h3>
+                  <p class="text-xs text-slate-500">
+                    Acompanhe as suas reservas efetuadas
+                  </p>
+                </div>
+                <button
+                  id="btn-recarregar"
+                  class="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                >
+                  🔄 Atualizar
+                </button>
+              </div>
+
+              <!-- Lista / Tabela -->
+              <div class="flex-1 overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                  <thead>
+                    <tr
+                      class="text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100"
+                    >
+                      <th class="py-3 px-3">Espaço</th>
+                      <th class="py-3 px-3">Data & Horário</th>
+                      <th class="py-3 px-3">Tipo / Motivo</th>
+                      <th class="py-3 px-3">Situação</th>
+                      <th class="py-3 px-3 text-right">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    id="tabela-meus-agendamentos"
+                    class="divide-y divide-slate-100"
+                  >
+                    <tr>
+                      <td
+                        colspan="5"
+                        class="py-8 text-center text-slate-400 text-sm"
+                      >
+                        Carregando seus agendamentos...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Scripts necessários -->
+    <script src="javascript/api.js"></script>
+    <script src="javascript/auth.js"></script>
+    <script src="javascript/agendamento-usuario.js"></script>
+  </body>
+</html>

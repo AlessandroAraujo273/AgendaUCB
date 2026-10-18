@@ -42,7 +42,7 @@ public class SalaDAO {
                         rs.getInt("id_predio"),
                         rs.getString("numero_sala"),
                         rs.getInt("capacidade"),
-                        TipoSala.valueOf(rs.getString("tipo_sala")), // Converte String do MySQL para Enum
+                        TipoSala.valueOf(rs.getString("tipo_sala")),
                         rs.getBoolean("possui_projetor"));
                 list.add(s);
             }

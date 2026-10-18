@@ -1,6 +1,32 @@
 # AgendaUCB
 Projeto acadêmico desenvolvido para a disciplina de Laboratório de Banco de Dados (2026/2) da Universidade Católica de Brasília (UCB).
 
+---
+
+## 🛠️ Pré-requisitos
+- **Java JDK 17+** instalado.
+- **MySQL Server 8.0+** instalado e em execução (porta padrão `3306`).
+- **Driver JDBC do MySQL** (`mysql-connector-j.jar`) adicionado às bibliotecas do projeto (Classpath/Referenced Libraries).
+
+---
+
+## 🚀 Como Executar o Sistema
+
+### 1. Configurar o Banco de Dados (MySQL)
+Antes de iniciar a aplicação Java, prepare o banco de dados executando os scripts contidos na pasta `sql/`:
+1. Abra seu cliente MySQL (Terminal, MySQL Workbench, DBeaver, etc.).
+2. Execute o script `sql/01_ddl.sql` para criar o banco de dados `agenda_ucb` e toda a sua estrutura de tabelas.
+3. Execute o script `sql/02_carga.sql` para popular o banco com os dados iniciais de teste.
+4. *(Opcional)* Execute o script `sql/03_consultas.sql` para verificar a validação das buscas.
+
+### 2. Configurar as Credenciais da Aplicação
+1. Crie o arquivo `db.properties` na raiz do projeto utilizando o arquivo de exemplo (`db.properties.example` ou `db.properties.template`).
+2. Insira as credenciais de acesso ao seu MySQL (host, porta, usuário e senha):
+   ```properties
+   db.url=jdbc:mysql://localhost:3306/agenda_ucb
+   db.user=seu_usuario
+   db.password=sua_senha
+
 ## Tema e Escopo
 O **AgendaUCB** é uma plataforma criada para simplificar e centralizar o agendamento de espaços físicos e recursos materiais no campus universitário. O sistema atende a toda a comunidade acadêmica, dividida em perfis especializados (discentes, docentes e gestão departamental).
 

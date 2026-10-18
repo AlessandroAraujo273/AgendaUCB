@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgendaUCB - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-slate-100 min-h-screen flex items-center justify-center p-4 font-sans text-slate-800"
+  >
+    <div
+      class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
+    >
+      <!-- Header -->
+      <div class="p-8 text-center bg-slate-900 text-white">
+        <div
+          class="w-12 h-12 bg-blue-600 rounded-xl mx-auto flex items-center justify-center font-black text-xl tracking-wider shadow mb-3"
+        >
+          UCB
+        </div>
+        <h1 class="text-2xl font-bold">AgendaUCB</h1>
+        <p class="text-xs text-slate-400 mt-1">
+          Acesso ao Sistema Institucional de Recursos
+        </p>
+      </div>
+
+      <!-- Feedback de Erro -->
+      <div
+        id="alerta-erro"
+        class="hidden m-6 mb-0 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg font-medium flex items-center gap-2"
+      >
+        <span>⚠️</span>
+        <span id="alerta-texto"></span>
+      </div>
+
+      <!-- Formulário -->
+      <form id="form-login" class="p-8 space-y-5">
+        <div>
+          <label
+            for="email"
+            class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+            >E-mail Institucional</label
+          >
+          <input
+            type="email"
+            id="email"
+            name="email_institucional"
+            placeholder="exemplo@ucb.br"
+            required
+            class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label
+            for="senha"
+            class="block text-xs font-semibold text-slate-700 uppercase mb-1"
+            >Senha</label
+          >
+          <input
+            type="password"
+            id="senha"
+            name="senha"
+            placeholder="••••••••"
+            required
+            class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <button
+          type="submit"
+          id="btn-entrar"
+          class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition flex items-center justify-center gap-2"
+        >
+          <span>Entrar</span>
+        </button>
+
+        <div class="text-center pt-2 border-t border-slate-100">
+          <p class="text-xs text-slate-500">
+            Não possui uma conta?
+            <a
+              href="cadastro.html"
+              class="text-blue-600 hover:underline font-semibold"
+              >Cadastre-se aqui</a
+            >
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <script src="javascript/api.js"></script>
+    <script src="javascript/auth.js"></script>
+    <script>
+      document
+        .getElementById("form-login")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const erroBox = document.getElementById("alerta-erro");
+          const erroTexto = document.getElementById("alerta-texto");
+          const btn = document.getElementById("btn-entrar");
+
+          erroBox.classList.add("hidden");
+          btn.disabled = true;
+          btn.innerHTML = "<span>Verificando...</span>";
+
+          const email = document.getElementById("email").value.trim();
+          const senha = document.getElementById("senha").value;
+
+          try {
+            const resposta = await API.post("/login", {
+              email_institucional: email,
+              senha: senha,
+            });
+
+            // Grava usuário retornado pelo LoginController no localStorage
+            if (resposta && resposta.usuario) {
+              Auth.salvarSessao(resposta.usuario);
+              window.location.href = "index.html";
+            } else {
+              throw new Error("Resposta de login inválida.");
+            }
+          } catch (err) {
+            erroTexto.textContent = err.message || "Falha na autenticação";
+            erroBox.classList.remove("hidden");
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = "<span>Entrar</span>";
+          }
+        });
+    </script>
+  </body>
+</html>
