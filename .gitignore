@@ -33,3 +33,5 @@ $RECYCLE.BIN/
 .LSOverride
 
 *.properties
+
+!lib/myconnector.jar
